@@ -1,0 +1,2364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Wardrobe Underwriter</title>
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0D1B2A">
+<!-- iOS PWA meta -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Wardrobe">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  /* Brand palette — The Wardrobe Underwriter */
+  --navy:#0D1B2A;
+  --navy-2:#1A2A40;
+  --cream:#F5F0E8;
+  --cream-2:#FAF6EE;
+  --gold:#C9A84C;
+  --gold-dk:#A88A2E;
+  --gold-tint:rgba(201,168,76,0.14);
+  --gold-tint-strong:rgba(201,168,76,0.28);
+
+  /* Semantic tokens */
+  --bg:var(--cream);
+  --surface:var(--cream-2);
+  --border:#E6DCC8;
+  --text:var(--navy);
+  --text-muted:#6B7280;
+  --accent:var(--gold);
+  --accent-dk:var(--gold-dk);
+  --danger:#B91C1C;
+
+  --r:12px;
+  --sh:0 1px 3px rgba(13,27,42,.06),0 4px 16px rgba(13,27,42,.05);
+  --sh-lg:0 8px 32px rgba(13,27,42,.12),0 2px 8px rgba(13,27,42,.07);
+
+  --font-serif:'Playfair Display',Georgia,'Times New Roman',serif;
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  color:var(--text);min-height:100vh;
+  background-color:var(--cream);
+  background-image:
+    linear-gradient(rgba(245,240,232,0.94), rgba(245,240,232,0.94)),
+    url('https://images.unsplash.com/photo-1618236444721-4a8dba415c15?w=1800&auto=format&fit=crop&q=80');
+  background-size:cover;
+  background-position:center top;
+  background-attachment:fixed;
+}
+
+/* ── Header ── */
+header{
+  background:var(--navy);
+  border-bottom:2px solid var(--gold);
+  padding:0 28px;min-height:124px;
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+  position:sticky;top:0;z-index:100;
+  color:var(--cream);
+}
+.logo{height:48px;width:auto;display:block;justify-self:start;flex-shrink:0}
+.tagline{
+  justify-self:center;
+  display:flex;align-items:center;gap:14px;white-space:nowrap;
+  font-size:11px;font-weight:600;letter-spacing:.32em;
+  text-transform:uppercase;color:var(--gold);
+}
+.tagline::before, .tagline::after{
+  content:"";display:block;width:36px;height:1px;background:var(--gold);
+  opacity:.7;
+}
+@media(max-width:820px){
+  .tagline{display:none}
+  header{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  header{padding:14px 18px;min-height:0}
+  .logo{height:36px}
+}
+
+/* Action row sits in the tabs bar, in line with Portfolio/Pipeline */
+.actions-row{display:flex;align-items:center;gap:10px}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 16px;
+  border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;
+  transition:all .15s;border:none;font-family:inherit;
+}
+.btn-primary{
+  background:var(--navy);color:var(--cream);
+  border:1px solid var(--gold);
+}
+.btn-primary:hover{background:var(--navy-2)}
+.btn-primary svg{color:var(--gold)}
+.btn-ghost{background:transparent;color:var(--text-muted);border:1px solid var(--border)}
+.btn-ghost:hover{background:var(--gold-tint);color:var(--text);border-color:var(--gold)}
+.btn-danger{background:var(--danger);color:#fff;border:1px solid var(--danger)}
+.btn-danger:hover{background:#991b1b}
+.btn-icon{width:36px;height:36px;padding:0;justify-content:center}
+
+
+/* ── Filter bar ── */
+.filter-bar{
+  background:rgba(250,246,238,0.92);
+  border-bottom:1px solid var(--border);
+  padding:14px 24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+}
+.search-wrap{position:relative;flex:1;min-width:180px;max-width:300px}
+.search-wrap svg{position:absolute;left:14px;top:50%;width:16px;height:16px;transform:translateY(-50%);color:var(--text-muted);pointer-events:none;z-index:1}
+input[type=text].search-input{
+  width:100%;padding:9px 12px 9px 42px;border:1px solid var(--border);
+  border-radius:8px;font-size:14px;background:var(--bg);color:var(--text);
+  outline:none;transition:border-color .15s;font-family:inherit;
+}
+input[type=text].search-input:focus{border-color:var(--text)}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{
+  padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;
+  cursor:pointer;border:1px solid var(--border);background:var(--surface);
+  color:var(--text-muted);transition:all .15s;white-space:nowrap;
+  text-transform:uppercase;letter-spacing:.05em;
+}
+.pill:hover{background:var(--gold-tint);color:var(--navy);border-color:var(--gold)}
+.pill.on{background:var(--navy);color:var(--cream);border-color:var(--gold)}
+
+/* ── Grid ── */
+.main{padding:24px;position:relative;z-index:1}
+.grid-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.count{font-size:13px;color:var(--text-muted)}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+  gap:16px;
+  position:relative;z-index:2;
+}
+
+/* ── Tabs (Inventory / Wishlist) ── */
+.tabs-bar{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:8px 24px 0;background:rgba(250,246,238,0.85);
+  border-bottom:1px solid var(--border);position:relative;z-index:2;
+  flex-wrap:wrap;
+}
+.tabs{display:flex;gap:4px}
+.tab{
+  padding:12px 18px;font-size:13px;font-weight:700;cursor:pointer;
+  color:var(--text-muted);border-bottom:3px solid transparent;
+  text-transform:uppercase;letter-spacing:.18em;transition:all .15s;
+  background:transparent;border-top:none;border-left:none;border-right:none;
+  font-family:inherit;margin-bottom:-1px;
+}
+.tab:hover{color:var(--navy)}
+.tab.on{color:var(--navy);border-bottom-color:var(--gold)}
+.actions-row{padding-bottom:8px}
+
+/* ── Commonly worn with ── */
+.cww-section{margin-top:18px;padding:14px;background:var(--bg);border-radius:8px}
+.cww-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.cww-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.cww-thumb{width:64px;height:64px;border-radius:8px;overflow:hidden;cursor:pointer;
+  position:relative;border:1px solid var(--border);transition:transform .12s}
+.cww-thumb:hover{transform:scale(1.05)}
+.cww-thumb img{width:100%;height:100%;object-fit:cover}
+.cww-thumb-no{width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+  background:var(--surface);color:var(--text-muted)}
+.cww-rm{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;
+  background:var(--danger);color:#fff;border:2px solid #fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:11px;line-height:1;padding:0}
+.cww-search{position:relative;margin-top:8px}
+.cww-search input{width:100%}
+.cww-results{position:absolute;top:100%;left:0;right:0;background:var(--surface);
+  border:1px solid var(--border);border-radius:8px;max-height:240px;overflow-y:auto;
+  z-index:5;margin-top:4px;box-shadow:var(--sh);display:none}
+.cww-results.open{display:block}
+.cww-result{display:flex;align-items:center;gap:10px;padding:8px 10px;cursor:pointer;
+  border-bottom:1px solid var(--border)}
+.cww-result:last-child{border-bottom:none}
+.cww-result:hover{background:var(--bg)}
+.cww-result img{width:36px;height:36px;object-fit:cover;border-radius:6px;flex-shrink:0}
+.cww-result-no{width:36px;height:36px;background:var(--bg);border-radius:6px;display:flex;
+  align-items:center;justify-content:center;color:var(--text-muted);flex-shrink:0}
+.cww-result-info{flex:1;min-width:0}
+.cww-result-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cww-result-meta{font-size:11px;color:var(--text-muted)}
+
+/* Wishlist badge */
+.wish-badge{display:inline-block;font-size:9px;padding:2px 6px;border-radius:3px;
+  background:#fde68a;color:#92400e;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-left:6px}
+
+/* Settings buttons row */
+.settings-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+
+/* ── Card ── */
+.card{
+  position:relative;
+  background:var(--cream-2);color:var(--navy);
+  border-radius:var(--r);overflow:hidden;
+  box-shadow:var(--sh);cursor:pointer;transition:transform .15s,box-shadow .15s;
+  border:1px solid var(--border);
+}
+.card:hover{transform:translateY(-3px);box-shadow:var(--sh-lg);border-color:var(--gold)}
+/* card action buttons (edit / delete) shown on hover */
+.card-acts{
+  position:absolute;top:8px;right:8px;
+  display:flex;gap:5px;
+  opacity:0;transition:opacity .18s;pointer-events:none;
+}
+.card:hover .card-acts{opacity:1;pointer-events:all}
+.c-act{
+  width:30px;height:30px;border-radius:50%;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.95);
+  box-shadow:0 1px 6px rgba(0,0,0,.22);
+  transition:transform .12s;color:var(--text);
+}
+.c-act:hover{transform:scale(1.12)}
+.c-act-del{color:var(--danger)}
+.c-act-uw{color:#059669}
+.card-photo{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:var(--bg)}
+.card-no-photo{
+  width:100%;aspect-ratio:3/4;background:var(--bg);display:flex;
+  align-items:center;justify-content:center;color:var(--border);
+}
+.card-info{padding:11px 12px 13px}
+.card-name{font-size:13px;font-weight:600;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+/* ── Badges (unified gold treatment per brand identity) ── */
+.badge{
+  display:inline-flex;align-items:center;padding:3px 9px;border-radius:4px;
+  font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;
+  background:var(--gold-tint);color:var(--navy);
+  border:1px solid var(--gold);
+}
+.b-Tops,.b-Bottoms,.b-Dresses,.b-Sets,.b-Outerwear,.b-Shoes,.b-Bags,.b-Accessories,.b-Other{
+  background:var(--gold-tint);color:var(--navy);border-color:var(--gold);
+}
+
+.cdot{width:13px;height:13px;border-radius:50%;border:1px solid rgba(0,0,0,.1);flex-shrink:0}
+
+/* ── Empty state ── */
+.empty{
+  grid-column:1/-1;text-align:center;padding:80px 24px;color:var(--text-muted);
+}
+.empty svg{margin:0 auto 16px;opacity:.25}
+.empty h2{font-family:var(--font-serif);font-size:22px;font-weight:600;color:var(--navy);margin-bottom:8px}
+.empty p{font-size:14px}
+
+/* ── Overlay / Modal ── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;
+  display:none;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(3px);
+}
+.overlay.open{display:flex}
+.modal{
+  background:var(--surface);border-radius:16px;width:100%;max-width:620px;
+  max-height:92vh;overflow-y:auto;box-shadow:var(--sh-lg);
+}
+.modal-hd{
+  padding:22px 22px 0;display:flex;justify-content:space-between;align-items:center;
+  position:sticky;top:0;background:var(--surface);z-index:1;
+  padding-bottom:14px;border-bottom:1px solid var(--border);
+}
+.modal-title{font-family:var(--font-serif);font-size:20px;font-weight:600;color:var(--navy)}
+.modal-body{padding:22px}
+.modal-ft{
+  padding:14px 22px 22px;display:flex;gap:10px;align-items:center;
+  border-top:1px solid var(--border);
+}
+.spacer{flex:1}
+
+/* ── Form ── */
+.fg{margin-bottom:16px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+label{
+  display:block;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--text-muted);margin-bottom:5px;
+}
+input[type=text],input[type=number],input[type=password],select,textarea{
+  width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;
+  font-size:14px;font-family:inherit;color:var(--text);background:var(--surface);
+  outline:none;transition:border-color .15s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--text)}
+textarea{resize:vertical;min-height:78px}
+
+/* ── Photo upload ── */
+.upload-zone{
+  border:2px dashed var(--border);border-radius:var(--r);
+  text-align:center;cursor:pointer;transition:all .15s;position:relative;
+  overflow:hidden;
+}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:#fdf8f2}
+.upload-zone input{display:none}
+.upload-prompt{padding:30px}
+.upload-txt{font-size:13px;color:var(--text-muted);margin-top:10px}
+.upload-txt strong{color:var(--text)}
+/* multi-photo grid */
+.photo-grid{display:flex;flex-wrap:wrap;gap:8px;padding:12px;align-items:flex-start}
+.photo-thumb{position:relative;width:82px;height:82px;flex-shrink:0}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;border-radius:8px;border:1px solid var(--border);display:block}
+.photo-thumb-rm{
+  position:absolute;top:-6px;right:-6px;width:20px;height:20px;
+  border-radius:50%;background:var(--danger);color:#fff;border:2px solid #fff;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-size:13px;line-height:1;z-index:3;padding:0;
+}
+.photo-thumb-rm:hover{background:#dc2626}
+.photo-add{
+  width:82px;height:82px;border:2px dashed var(--border);border-radius:8px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--text-muted);font-size:22px;transition:all .15s;
+  gap:2px;z-index:3;position:relative;flex-shrink:0;
+}
+.photo-add:hover{border-color:var(--accent);color:var(--accent);background:#fdf8f2}
+.photo-add span{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+/* detail photo strip */
+.det-photos{margin-bottom:4px}
+.det-main-photo{width:100%;max-height:340px;object-fit:contain;border-radius:var(--r);background:var(--bg);display:block}
+.det-strip{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.det-strip-thumb{
+  width:60px;height:60px;object-fit:cover;border-radius:6px;
+  border:2px solid transparent;cursor:pointer;transition:all .15s;opacity:.7;
+}
+.det-strip-thumb:hover{opacity:1}
+.det-strip-thumb.active{border-color:var(--accent);opacity:1}
+
+/* ── AI section ── */
+.ai-box{
+  background:#fdf8f2;border:1px solid #f0dfc0;border-radius:var(--r);
+  padding:14px 16px;margin-bottom:16px;
+}
+.ai-hd{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ai-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--accent-dk)}
+.ai-chip{font-size:10px;padding:2px 7px;border-radius:4px;background:var(--accent);color:#fff;font-weight:700}
+.ai-status{font-size:13px;color:var(--text-muted)}
+.loading{display:flex;align-items:center;gap:8px}
+.spin{
+  width:15px;height:15px;border:2px solid var(--border);
+  border-top-color:var(--accent);border-radius:50%;
+  animation:spin .7s linear infinite;flex-shrink:0;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── URL import section ── */
+.url-box{
+  background:#f0f4ff;border:1px solid #d0d9f5;border-radius:var(--r);
+  padding:14px 16px;margin-bottom:16px;
+}
+.url-hd{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.url-lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#3b5bdb}
+.url-chip{font-size:10px;padding:2px 7px;border-radius:4px;background:#3b5bdb;color:#fff;font-weight:700}
+.url-row{display:flex;gap:8px}
+.url-row input{flex:1;background:#fff}
+.url-status{font-size:13px;color:var(--text-muted);margin-top:8px;min-height:18px}
+.source-link{
+  display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#3b5bdb;
+  text-decoration:none;padding:4px 10px;border-radius:6px;background:#f0f4ff;
+  border:1px solid #d0d9f5;margin-top:4px;
+}
+.source-link:hover{background:#e4ecff}
+
+/* ── Detail view ── */
+.detail-img{width:100%;max-height:340px;object-fit:contain;border-radius:var(--r);background:var(--bg)}
+.attrs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.attr{padding:11px 12px;background:var(--bg);border-radius:8px}
+.attr-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:3px}
+.attr-val{font-size:14px;font-weight:500}
+
+/* ── Toast ── */
+.toast{
+  position:fixed;bottom:22px;right:22px;background:var(--text);color:#fff;
+  padding:11px 18px;border-radius:8px;font-size:14px;z-index:999;
+  transform:translateY(80px);opacity:0;transition:all .25s;max-width:300px;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.err{background:var(--danger)}
+
+/* ── Weather chip (in header) ── */
+.weather-chip{
+  justify-self:end;
+  display:none;align-items:center;gap:10px;
+  background:rgba(245,240,232,0.06);
+  border:1px solid rgba(245,240,232,0.18);
+  border-radius:24px;padding:6px 14px;
+  color:var(--cream);font-size:13px;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+}
+.weather-chip.ready{display:inline-flex}
+.wx-icon{font-size:18px;line-height:1}
+.wx-temp{font-weight:700;color:var(--gold)}
+.wx-cond{opacity:.85;text-transform:uppercase;font-size:10.5px;letter-spacing:.12em}
+@media(max-width:820px){
+  .weather-chip{justify-self:end}
+}
+@media(max-width:560px){
+  .weather-chip{padding:5px 10px;font-size:12px;gap:6px}
+  .wx-cond{display:none}
+}
+
+/* ── Install banner (PWA add-to-home-screen) ── */
+.install-banner{
+  position:fixed;bottom:-160px;left:0;right:0;
+  background:var(--navy);color:var(--cream);
+  border-top:2px solid var(--gold);
+  padding:14px 20px;display:flex;align-items:center;gap:16px;
+  flex-wrap:wrap;justify-content:space-between;
+  transition:bottom .35s cubic-bezier(.4,0,.2,1);z-index:300;
+  box-shadow:0 -6px 24px rgba(0,0,0,.25);
+}
+.install-banner.show{bottom:0}
+.install-text{flex:1;min-width:220px;font-size:13px;line-height:1.45}
+.install-text strong{color:var(--gold);font-weight:700}
+.install-acts{display:flex;gap:10px;align-items:center}
+.install-banner .btn-link{
+  background:none;border:none;color:var(--cream);cursor:pointer;
+  font:inherit;font-size:13px;padding:8px 12px;opacity:.7;
+}
+.install-banner .btn-link:hover{opacity:1}
+.install-banner .btn-primary{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.install-banner .btn-primary:hover{background:var(--gold-dk);border-color:var(--gold-dk)}
+.install-banner .btn-primary svg{color:var(--navy)}
+
+/* ── Today's Allocation modal content ── */
+.allocation-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;
+  cursor:pointer;border:1px solid var(--gold);background:transparent;
+  color:var(--navy);font-family:inherit;transition:all .15s;
+}
+.allocation-pill:hover{background:var(--gold-tint)}
+.allocation-pill svg{color:var(--gold)}
+.alloc-weather{
+  background:var(--gold-tint);border:1px solid var(--gold);border-radius:8px;
+  padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:12px;
+}
+.alloc-weather-icon{font-size:24px;line-height:1}
+.alloc-weather-text{flex:1;font-size:13px;line-height:1.5}
+.alloc-weather-text strong{color:var(--navy)}
+.alloc-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;
+  margin-top:10px;
+}
+.alloc-card{
+  background:var(--cream-2);border:1px solid var(--border);border-radius:10px;
+  overflow:hidden;cursor:pointer;transition:transform .12s;
+}
+.alloc-card:hover{transform:translateY(-2px);border-color:var(--gold)}
+.alloc-card img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:var(--bg)}
+.alloc-card-info{padding:8px 10px}
+.alloc-card-cat{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold-dk);margin-bottom:2px}
+.alloc-card-name{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alloc-empty{padding:32px 16px;text-align:center;color:var(--text-muted);font-size:13px}
+
+/* ── Responsive ── */
+@media(max-width:600px){
+  .filter-bar{flex-direction:column;align-items:stretch}
+  .search-wrap{max-width:100%}
+  .frow{grid-template-columns:1fr}
+  .attrs{grid-template-columns:1fr}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+}
+</style>
+</head>
+<body>
+
+<!-- ── Header ────────────────────────────────── -->
+<header>
+  <img class="logo" src="The%20Wardrobe%20Underwriter%20Logo%20-%20primary%20lockup%20horizontal.png" alt="The Wardrobe Underwriter">
+  <div class="tagline">Every Piece. Justified.</div>
+  <div class="weather-chip" id="weatherChip" aria-live="polite"></div>
+</header>
+
+<!-- ── Tabs + actions row ──────────────────────── -->
+<div class="tabs-bar">
+  <div class="tabs">
+    <button class="tab on" id="tabInv" onclick="switchView('inventory')">Portfolio</button>
+    <button class="tab"    id="tabWish" onclick="switchView('wishlist')">Pipeline</button>
+  </div>
+  <div class="actions-row">
+    <button class="allocation-pill" onclick="openAllocation()" title="Today's Allocation">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>
+      Today's Allocation
+    </button>
+    <button class="btn btn-ghost btn-icon" onclick="openSettings()" title="Settings">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+    <button class="btn btn-primary" onclick="openAdd()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Underwrite Item
+    </button>
+  </div>
+</div>
+
+<!-- ── Filter bar ─────────────────────────────── -->
+<div class="filter-bar">
+  <div class="search-wrap">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input type="text" class="search-input" id="searchQ" placeholder="Search items…" oninput="render()">
+  </div>
+  <div class="pills" id="pills">
+    <div class="pill on" data-c="All"         onclick="setCat('All')">All</div>
+    <div class="pill"    data-c="Tops"        onclick="setCat('Tops')">Tops</div>
+    <div class="pill"    data-c="Bottoms"     onclick="setCat('Bottoms')">Bottoms</div>
+    <div class="pill"    data-c="Dresses"     onclick="setCat('Dresses')">Dresses</div>
+    <div class="pill"    data-c="Sets"        onclick="setCat('Sets')">Sets</div>
+    <div class="pill"    data-c="Outerwear"   onclick="setCat('Outerwear')">Outerwear</div>
+    <div class="pill"    data-c="Shoes"       onclick="setCat('Shoes')">Shoes</div>
+    <div class="pill"    data-c="Bags"        onclick="setCat('Bags')">Bags</div>
+    <div class="pill"    data-c="Accessories" onclick="setCat('Accessories')">Accessories</div>
+    <div class="pill"    data-c="Other"       onclick="setCat('Other')">Other</div>
+  </div>
+</div>
+
+<!-- ── Main grid ──────────────────────────────── -->
+<main class="main">
+  <div class="grid-meta">
+    <span class="count" id="countEl"></span>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<!-- ══════════════════════════════════════════════
+     ADD ITEM MODAL
+══════════════════════════════════════════════ -->
+<div class="overlay" id="addOv" onclick="ovClick(event,'addOv')">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-title" id="addTitle">Underwrite Item</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeAdd()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <!-- URL import -->
+      <div class="url-box">
+        <div class="url-hd">
+          <span class="url-lbl">Import from URL</span>
+          <span class="url-chip">optional</span>
+        </div>
+        <div class="url-row">
+          <input type="text" id="furl" placeholder="Paste a product link — Uniqlo, Zara, H&M, ASOS…" oninput="onUrlInput()">
+          <button class="btn btn-primary" onclick="fetchFromUrl()" id="urlFetchBtn" style="white-space:nowrap;flex-shrink:0">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Fetch &amp; Fill
+          </button>
+        </div>
+        <div class="url-status" id="urlStatus">Paste a link to auto-import product details and photo.</div>
+      </div>
+
+      <!-- Photo upload -->
+      <div class="fg">
+        <label>Photos</label>
+        <div class="upload-zone" id="dropZone" onclick="zoneClick(event)">
+          <input type="file" id="photoIn" accept="image/*" multiple onchange="onPhoto(event)">
+          <div id="photoGrid" class="photo-grid" style="display:none"></div>
+          <div id="upPrompt" class="upload-prompt">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto;color:var(--border)">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            <div class="upload-txt"><strong>Click to upload</strong>, drag &amp; drop, or paste<br><small style="opacity:.7">JPG · PNG · WEBP · multiple photos supported · Ctrl+V to paste</small></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI section -->
+      <div class="ai-box">
+        <div class="ai-hd">
+          <span class="ai-lbl">AI Auto-Tag</span>
+          <span class="ai-chip">Claude</span>
+        </div>
+        <div class="ai-status" id="aiMsg">Upload a photo to auto-fill the fields below.</div>
+      </div>
+
+      <!-- Name + Brand -->
+      <div class="frow">
+        <div class="fg">
+          <label>Item Name *</label>
+          <input type="text" id="fn" placeholder="e.g. Linen Blazer">
+        </div>
+        <div class="fg">
+          <label>Brand</label>
+          <input type="text" id="fb" placeholder="e.g. Zara">
+        </div>
+      </div>
+
+      <!-- Retailer + Date Acquired -->
+      <div class="frow">
+        <div class="fg">
+          <label>Retailer</label>
+          <input type="text" id="fret" placeholder="e.g. Nordstrom, Amazon, Zara.com">
+        </div>
+        <div class="fg">
+          <label>Acquisition Date</label>
+          <input type="text" id="fdate" placeholder="e.g. March 2024, 2023">
+        </div>
+      </div>
+
+      <!-- Category + Color -->
+      <div class="frow">
+        <div class="fg">
+          <label>Category *</label>
+          <select id="fcat" onchange="onCatChange()">
+            <option value="">Select…</option>
+            <option>Tops</option><option>Bottoms</option><option>Dresses</option>
+            <option>Sets</option><option>Outerwear</option><option>Shoes</option>
+            <option>Bags</option><option>Accessories</option><option>Other</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Color</label>
+          <input type="text" id="fcol" placeholder="e.g. navy, cream">
+        </div>
+      </div>
+
+      <!-- Material/Texture + Classification -->
+      <div class="frow">
+        <div class="fg">
+          <label>Material / Texture</label>
+          <input type="text" id="fmat" placeholder="e.g. ribbed knit, silk, structured wool, washed denim">
+        </div>
+        <div class="fg">
+          <label>Classification</label>
+          <select id="fcls">
+            <option value="">Select…</option>
+            <option>Work — Business Casual</option>
+            <option>Work — Business Formal / Events</option>
+            <option>Casual</option>
+            <option>Smart Casual</option>
+            <option>Special Occasion</option>
+            <option>Athleisure</option>
+            <option>Vacation / Travel</option>
+            <option>PJs / Loungewear</option>
+            <option>Gym / Workout</option>
+            <option>Bags / Accessories</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Season + Size (size conditional) -->
+      <div class="frow">
+        <div class="fg">
+          <label>Season</label>
+          <select id="fsea">
+            <option value="">Select…</option>
+            <option>All-Season</option><option>Spring-Summer</option><option>Fall-Winter</option>
+          </select>
+        </div>
+        <div class="fg" id="fsizeWrap" style="display:none">
+          <label>Size</label>
+          <input type="text" id="fsize" placeholder="e.g. M, 8, 32x30">
+        </div>
+      </div>
+
+      <!-- Condition + Cost -->
+      <div class="frow">
+        <div class="fg">
+          <label>Current Condition</label>
+          <select id="fcon">
+            <option value="">Select…</option>
+            <option>Great</option><option>Good</option><option>Worn</option><option>Needs Repair</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Cost Basis ($)</label>
+          <input type="number" id="fcost" placeholder="0" min="0" step="1">
+        </div>
+      </div>
+
+      <!-- Why I Want It (wishlist only) -->
+      <div class="fg" id="fwhyWrap" style="display:none">
+        <label>Why I Want It</label>
+        <textarea id="fwhy" placeholder="What draws you to this piece?"></textarea>
+      </div>
+
+      <!-- Investment Notes -->
+      <div class="fg">
+        <label>Investment Notes</label>
+        <textarea id="fnotes" placeholder="Fit notes, where you bought it, styling ideas…"></textarea>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeAdd()">Cancel</button>
+      <div class="spacer"></div>
+      <button class="btn btn-primary" onclick="saveNew()">Save Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     DETAIL / EDIT MODAL
+══════════════════════════════════════════════ -->
+<div class="overlay" id="detOv" onclick="ovClick(event,'detOv')">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-title" id="detTitle">Details</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-icon" id="editBtn" onclick="toggleEdit()" title="Edit"></button>
+        <button class="btn btn-ghost btn-icon" onclick="closeDet()">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body" id="detBody"></div>
+    <div class="modal-ft" id="detFt"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     SETTINGS MODAL
+══════════════════════════════════════════════ -->
+<div class="overlay" id="setOv" onclick="ovClick(event,'setOv')">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-title">Settings</span>
+      <button class="btn btn-ghost btn-icon" onclick="closeSettings()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <label>Claude API Key</label>
+        <input type="password" id="apiIn" placeholder="sk-ant-api03-…">
+        <p style="font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.6">
+          Stored only in your browser's <code>localStorage</code>. Never transmitted anywhere except directly to <strong>api.anthropic.com</strong>.
+          Get a key at <strong>console.anthropic.com</strong>.
+        </p>
+      </div>
+      <div class="fg">
+        <label>Storage Usage</label>
+        <div id="storeInfo" style="font-size:13px;color:var(--text-muted)">–</div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.6">
+          localStorage has a ~5 MB limit. Photos are stored as base64 (a 1 MB photo ≈ 1.37 MB stored).
+          At scale you'll likely hit this within 30–50 photos. See end-of-session notes for alternatives.
+        </p>
+      </div>
+      <div class="fg">
+        <label>Backup &amp; Restore</label>
+        <div class="settings-row">
+          <button class="btn btn-ghost" onclick="exportData()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export JSON
+          </button>
+          <button class="btn btn-ghost" onclick="$('importFile').click()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Import JSON
+          </button>
+          <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importData(event)">
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.6">
+          Exports all Portfolio + Pipeline (including photos) to a downloadable file. Import will merge with existing data.
+        </p>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="closeSettings()">Cancel</button>
+      <div class="spacer"></div>
+      <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     TODAY'S ALLOCATION MODAL
+══════════════════════════════════════════════ -->
+<div class="overlay" id="allocOv" onclick="ovClick(event,'allocOv')">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-title">Today's Allocation</span>
+      <button class="btn btn-ghost btn-icon" onclick="close$('allocOv')">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body" id="allocBody"></div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" onclick="close$('allocOv')">Close</button>
+      <div class="spacer"></div>
+      <button class="btn btn-primary" onclick="rerollAllocation()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Re-roll
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Install banner (PWA) ──────────────────── -->
+<div class="install-banner" id="installBanner">
+  <div class="install-text" id="installText"><strong>Add to Home Screen</strong> for the full experience.</div>
+  <div class="install-acts">
+    <button class="btn-link" onclick="dismissInstall()">Dismiss</button>
+    <button class="btn btn-primary install-action" id="installAction" onclick="doInstall()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Install
+    </button>
+  </div>
+</div>
+
+<!-- ── Toast ──────────────────────────────────── -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════ -->
+<script>
+// ─── Constants ────────────────────────────────────────────────────────────────
+const CATS = ['Tops','Bottoms','Dresses','Sets','Outerwear','Shoes','Bags','Accessories','Other'];
+const SIZE_CATS = ['Tops','Bottoms','Sets','Dresses','Outerwear','Shoes']; // categories that show Size field
+const CLASSES = [
+  'Work — Business Casual',
+  'Work — Business Formal / Events',
+  'Casual',
+  'Smart Casual',
+  'Special Occasion',
+  'Athleisure',
+  'Vacation / Travel',
+  'PJs / Loungewear',
+  'Gym / Workout',
+  'Bags / Accessories',
+];
+const SEAS = ['All-Season','Spring-Summer','Fall-Winter'];
+const CONDS = ['Great','Good','Worn','Needs Repair'];
+const COLOR_MAP = {
+  black:'#1a1a1a',white:'#f5f5f5',gray:'#9ca3af',grey:'#9ca3af',
+  red:'#ef4444',pink:'#ec4899',rose:'#fb7185',orange:'#f97316',
+  yellow:'#eab308',gold:'#f59e0b',green:'#22c55e',teal:'#14b8a6',
+  blue:'#3b82f6',navy:'#1e3a5f',cobalt:'#1e40af',purple:'#a855f7',
+  lavender:'#c084fc',violet:'#8b5cf6',brown:'#92400e',tan:'#c8a06a',
+  beige:'#d4b896',cream:'#f5e6c8',ivory:'#f9f3e3',khaki:'#bdb76b',
+  olive:'#6b7c4d',burgundy:'#7f1d1d',maroon:'#7f1d1d',coral:'#f87171',
+  mint:'#6ee7b7',sage:'#84b89a',camel:'#c19a6b',rust:'#b45309',
+  silver:'#c0c0c0',charcoal:'#374151',indigo:'#4338ca',forest:'#15803d',
+  emerald:'#10b981',denim:'#4b6cb7',blush:'#f9c0b6',taupe:'#b8a89a',
+  mustard:'#d4a017',slate:'#64748b',
+};
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let items = [];
+let wishlist = [];
+let apiKey = '';
+let activeCat = 'All';
+let activeView = 'inventory'; // 'inventory' | 'wishlist'
+let photos = []; // [{b64, mime}] — ordered list of photos for the item being added
+let editPhotos = []; // array of data URL strings — photos for the item currently being edited
+let viewId = null;
+let viewIsWish = false;
+let editMode = false;
+let addMode = 'inventory'; // 'inventory' | 'wishlist' — what we're adding
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+(function init() {
+  try { items = JSON.parse(localStorage.getItem('wrd_items') || '[]'); } catch { items = []; }
+  try { wishlist = JSON.parse(localStorage.getItem('wrd_wish') || '[]'); } catch { wishlist = []; }
+  apiKey = localStorage.getItem('wrd_key') || '';
+  // Schema migration: backfill new fields on existing items
+  items = items.map(migrateItem);
+  wishlist = wishlist.map(migrateItem);
+  persist();
+  render();
+  setupDrop();
+})();
+
+// Backfill new fields onto existing items, leaving original fields intact
+function migrateItem(it) {
+  if (!it) return it;
+  // Map legacy formality → classification (best-effort)
+  let cls = it.classification;
+  if (!cls && it.formality) {
+    const map = {
+      'Casual':'Casual', 'Smart Casual':'Smart Casual',
+      'Business Casual':'Work — Business Casual',
+      'Business Formal':'Work — Business Formal / Events',
+      'Black Tie':'Special Occasion', 'Athleisure':'Athleisure',
+    };
+    cls = map[it.formality] || 'Casual';
+  }
+  return {
+    classification: cls || 'Casual',
+    material:    it.material    ?? '',
+    size:        it.size        ?? '',
+    retailer:    it.retailer    ?? '',
+    dateAcquired:it.dateAcquired?? '',
+    linkedIds:   Array.isArray(it.linkedIds) ? it.linkedIds : [],
+    ...it,
+    // Ensure these are present even if it.X overwrote with undefined
+    classification: it.classification || cls || 'Casual',
+    material:    it.material    ?? '',
+    size:        it.size        ?? '',
+    retailer:    it.retailer    ?? '',
+    dateAcquired:it.dateAcquired?? '',
+    linkedIds:   Array.isArray(it.linkedIds) ? it.linkedIds : [],
+  };
+}
+
+// ─── Persistence ──────────────────────────────────────────────────────────────
+function persist() {
+  try {
+    localStorage.setItem('wrd_items', JSON.stringify(items));
+    localStorage.setItem('wrd_wish', JSON.stringify(wishlist));
+  } catch (e) {
+    if (e.name === 'QuotaExceededError') toast('Storage full — try removing old photos.', true);
+    else throw e;
+  }
+}
+
+// ─── Rendering ────────────────────────────────────────────────────────────────
+function currentList() { return activeView === 'wishlist' ? wishlist : items; }
+
+function render() {
+  const searchEl = document.getElementById('searchQ');
+  const q = (searchEl?.value || '').toLowerCase().trim();
+  const source = currentList();
+  const list = source.filter(it => {
+    if (!it) return false;
+    if (activeCat !== 'All' && it.category !== activeCat) return false;
+    if (!q) return true;
+    return [it.name, it.brand, it.color, it.notes].some(v => v && String(v).toLowerCase().includes(q));
+  });
+
+  const countEl = document.getElementById('countEl');
+  if (countEl) countEl.textContent = `${list.length} item${list.length !== 1 ? 's' : ''}`;
+
+  const g = document.getElementById('grid');
+  if (!g) return;
+
+  if (!list.length) {
+    const isWish = activeView === 'wishlist';
+    g.innerHTML = `<div class="empty">
+      <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+        <path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.57a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.57a2 2 0 0 0-1.34-2.23z"/>
+      </svg>
+      <h2>${source.length === 0 ? (isWish ? 'Your pipeline is empty' : 'Your portfolio is empty') : 'No items match'}</h2>
+      <p>${source.length === 0
+          ? (isWish ? 'Click "Underwrite Item" to add something you’re eyeing.' : 'Click "Underwrite Item" to start building your portfolio.')
+          : 'Try a different search or category.'}</p>
+    </div>`;
+    return;
+  }
+
+  try {
+    const html = list.map(renderCard).join('');
+    g.innerHTML = html;
+  } catch (err) {
+    console.error('Render error:', err, list);
+    g.innerHTML = `<div class="empty"><h2>Render error</h2><p>${esc(err.message)}</p></div>`;
+  }
+}
+
+function renderCard(it) {
+  const photoSrc = (Array.isArray(it.photos) && it.photos[0]) || it.photo || null;
+  const photoBlock = photoSrc
+    ? `<img class="card-photo" src="${esc(photoSrc)}" alt="${esc(it.name||'')}" loading="lazy">`
+    : `<div class="card-no-photo">${photoIcon(40)}</div>`;
+  const isWish = activeView === 'wishlist';
+  const wishBadge = isWish ? '<span class="wish-badge">Pipeline</span>' : '';
+  const underwriteBtn = isWish
+    ? `<button class="c-act c-act-uw" onclick="cardUnderwrite(event,'${it.id}')" title="Mark as Underwritten"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></button>`
+    : '';
+  return `<div class="card" onclick="openDet('${it.id}')">
+    <div class="card-acts">
+      ${underwriteBtn}
+      <button class="c-act" onclick="cardEdit(event,'${it.id}')" title="Edit"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      <button class="c-act c-act-del" onclick="cardDel(event,'${it.id}')" title="Delete"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+    </div>
+    ${photoBlock}
+    <div class="card-info">
+      <div class="card-name">${esc(it.name || 'Untitled')}${wishBadge}</div>
+      <div class="card-meta">
+        ${it.category ? `<span class="badge b-${esc(it.category)}">${esc(it.category)}</span>` : ''}
+        ${it.color ? `<span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted)">${dot(it.color)}${esc(it.color)}</span>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function switchView(v) {
+  activeView = v;
+  document.getElementById('tabInv').classList.toggle('on', v === 'inventory');
+  document.getElementById('tabWish').classList.toggle('on', v === 'wishlist');
+  render();
+}
+
+function setCat(c) {
+  activeCat = c;
+  document.querySelectorAll('.pill').forEach(p => p.classList.toggle('on', p.dataset.c === c));
+  render();
+}
+
+function cardEdit(e, id) {
+  e.stopPropagation();
+  viewId = id; viewIsWish = activeView === 'wishlist'; editMode = true;
+  drawDet(); open$('detOv');
+}
+
+function cardDel(e, id) {
+  e.stopPropagation();
+  const arr = activeView === 'wishlist' ? wishlist : items;
+  const it = arr.find(i => i.id === id);
+  if (!confirm(`Delete "${it?.name || 'this item'}"? This cannot be undone.`)) return;
+  if (activeView === 'wishlist') wishlist = wishlist.filter(i => i.id !== id);
+  else items = items.filter(i => i.id !== id);
+  persist(); render();
+  toast('Item deleted');
+}
+
+// Quick-underwrite from a Pipeline card (without opening the detail view)
+function cardUnderwrite(e, id) {
+  e.stopPropagation();
+  underwrite(id);
+}
+
+// ─── Color dot ────────────────────────────────────────────────────────────────
+function dot(color) {
+  const lc = color.toLowerCase();
+  let hex = '#e5e7eb';
+  for (const [k, v] of Object.entries(COLOR_MAP)) {
+    if (lc.includes(k)) { hex = v; break; }
+  }
+  return `<span class="cdot" style="background:${hex}"></span>`;
+}
+
+// ─── Add modal ────────────────────────────────────────────────────────────────
+function openAdd() {
+  addMode = activeView; // adding to currently active view
+  photos = [];
+  resetAddForm();
+  $('addTitle').textContent = addMode === 'wishlist' ? 'Add to Pipeline' : 'Underwrite Item';
+  $('fwhyWrap').style.display = addMode === 'wishlist' ? 'block' : 'none';
+  open$('addOv');
+}
+function closeAdd() { close$('addOv'); }
+
+function resetAddForm() {
+  ['fn','fb','fcol','fcost','fnotes','furl','fmat','fsize','fret','fdate','fwhy'].forEach(id => { const el = $(id); if (el) el.value = ''; });
+  ['fcat','fcls','fsea','fcon'].forEach(id => { const el = $(id); if (el) el.value = ''; });
+  photos = [];
+  renderPhotoGrid();
+  $('photoIn').value = '';
+  $('aiMsg').textContent = 'Upload a photo to auto-fill the fields below.';
+  $('aiMsg').style.color = '';
+  $('urlStatus').textContent = 'Paste a link to auto-import product details and photo.';
+  $('urlStatus').style.color = '';
+  $('urlFetchBtn').disabled = true;
+  onCatChange();
+}
+
+// Show/hide Size field based on category
+function onCatChange() {
+  const cat = $('fcat')?.value || '';
+  const wrap = $('fsizeWrap');
+  if (!wrap) return;
+  wrap.style.display = SIZE_CATS.includes(cat) ? 'block' : 'none';
+}
+
+function onUrlInput() {
+  const v = $('furl').value.trim();
+  $('urlFetchBtn').disabled = !v;
+}
+
+// ─── Photo upload ─────────────────────────────────────────────────────────────
+function loadPhotoBlob(blob) {
+  if (!blob || !blob.type.startsWith('image/')) { toast('No image found in clipboard', true); return; }
+  if (blob.size > 10 * 1024 * 1024) { toast('Image must be under 10 MB', true); return; }
+  const mime = blob.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const b64 = ev.target.result.split(',')[1];
+    const isFirst = photos.length === 0;
+    photos.push({ b64, mime });
+    renderPhotoGrid();
+    if (isFirst) runAI(); // only auto-tag on the first photo
+  };
+  reader.readAsDataURL(blob);
+}
+
+function onPhoto(e) {
+  Array.from(e.target.files).forEach(f => loadPhotoBlob(f));
+  e.target.value = ''; // allow re-selecting same file
+}
+
+function rmPhoto(e, idx) {
+  e.stopPropagation();
+  photos.splice(idx, 1);
+  renderPhotoGrid();
+  if (photos.length === 0) {
+    $('aiMsg').textContent = 'Upload a photo to auto-fill the fields below.';
+    $('aiMsg').style.color = '';
+  }
+}
+
+function renderPhotoGrid() {
+  const grid = $('photoGrid');
+  const prompt = $('upPrompt');
+  if (photos.length === 0) {
+    grid.style.display = 'none';
+    prompt.style.display = 'block';
+    return;
+  }
+  prompt.style.display = 'none';
+  grid.style.display = 'flex';
+  grid.innerHTML = photos.map((p, i) => `
+    <div class="photo-thumb">
+      <img src="data:${p.mime};base64,${p.b64}" alt="Photo ${i + 1}">
+      <button class="photo-thumb-rm" onclick="rmPhoto(event,${i})" title="Remove">×</button>
+    </div>`).join('')
+    + `<div class="photo-add" title="Add more photos">
+        <span style="font-size:20px;line-height:1">+</span>
+        <span>Add</span>
+       </div>`;
+}
+
+// Fetch an image from a URL (direct first, then CORS proxy) → loadPhotoBlob
+async function loadPhotoFromUrl(url) {
+  if (!url || !url.startsWith('http')) return;
+  const tryFetch = async (fetchUrl) => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10000);
+    try {
+      const res = await fetch(fetchUrl, { signal: ctrl.signal });
+      clearTimeout(timer);
+      if (!res.ok) return null;
+      const blob = await res.blob();
+      return blob.type.startsWith('image/') ? blob : null;
+    } catch { clearTimeout(timer); return null; }
+  };
+  let blob = await tryFetch(url);
+  if (!blob) blob = await tryFetch(`https://corsproxy.io/?url=${encodeURIComponent(url)}`);
+  if (blob) loadPhotoBlob(blob);
+  else toast('Could not load image — try saving it locally first', true);
+}
+
+// Pull the first img src out of an HTML string
+function extractImgSrc(html) {
+  const m = html.match(/src=["']([^"']+)["']/i);
+  return m?.[1] || null;
+}
+
+function handlePasteEvent(e) {
+  // Determine which modal is active and route accordingly
+  const isAdd  = $('addOv').classList.contains('open');
+  const isEdit = $('detOv').classList.contains('open') && editMode;
+  if (!isAdd && !isEdit) return;
+  const blobLoader = isEdit ? loadEditPhotoBlob   : loadPhotoBlob;
+  const urlLoader  = isEdit ? loadEditPhotoFromUrl : loadPhotoFromUrl;
+
+  const clipItems = Array.from(e.clipboardData?.items || []);
+  if (!clipItems.length) return;
+
+  // 1. Direct image blob — right-click → Copy Image, or screenshot in clipboard
+  const imgItem = clipItems.find(i => i.type.startsWith('image/'));
+  if (imgItem) {
+    e.preventDefault();
+    const file = imgItem.getAsFile();
+    if (file) blobLoader(file);
+    return;
+  }
+
+  // Don't intercept text paste while typing in a regular text field
+  // (except for the URL field, where we want to fall through after image-check)
+  const tag = document.activeElement?.tagName;
+  const id  = document.activeElement?.id;
+  if ((tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') && id !== 'furl') return;
+
+  // 2. HTML with <img src> — some browsers paste images as HTML markup
+  const htmlItem = clipItems.find(i => i.type === 'text/html');
+  if (htmlItem) {
+    htmlItem.getAsString(html => {
+      const src = extractImgSrc(html);
+      if (src?.startsWith('http')) urlLoader(src);
+    });
+    return;
+  }
+
+  // 3. Plain URL string — drag/copy from address bar
+  const txtItem = clipItems.find(i => i.type === 'text/plain' || i.type === 'text/uri-list');
+  if (txtItem) {
+    txtItem.getAsString(s => {
+      const url = (s || '').trim().split('\n')[0].trim();
+      if (url.startsWith('http') && /\.(jpe?g|png|webp|gif)/i.test(url)) urlLoader(url);
+    });
+  }
+}
+
+function zoneClick(e) {
+  // Ignore clicks on remove buttons (they handle themselves); everything else opens picker
+  if (e.target.closest('.photo-thumb-rm')) return;
+  $('photoIn').click();
+}
+
+// ─── Edit-modal photo helpers (mirror the add-modal helpers) ─────────────────
+function loadEditPhotoBlob(blob) {
+  if (!blob || !blob.type.startsWith('image/')) { toast('No image found', true); return; }
+  if (blob.size > 10 * 1024 * 1024) { toast('Image must be under 10 MB', true); return; }
+  const reader = new FileReader();
+  reader.onload = ev => {
+    editPhotos.push(ev.target.result); // full data URL string
+    renderEditPhotoGrid();
+  };
+  reader.readAsDataURL(blob);
+}
+
+function onEditPhoto(e) {
+  Array.from(e.target.files).forEach(f => loadEditPhotoBlob(f));
+  e.target.value = '';
+}
+
+function rmEditPhoto(e, idx) {
+  e.stopPropagation();
+  editPhotos.splice(idx, 1);
+  renderEditPhotoGrid();
+}
+
+function renderEditPhotoGrid() {
+  const grid   = $('ef_photoGrid');
+  const prompt = $('ef_upPrompt');
+  if (!grid || !prompt) return;
+  if (editPhotos.length === 0) {
+    grid.style.display = 'none';
+    prompt.style.display = 'block';
+    return;
+  }
+  prompt.style.display = 'none';
+  grid.style.display = 'flex';
+  grid.innerHTML = editPhotos.map((src, i) => `
+    <div class="photo-thumb">
+      <img src="${esc(src)}" alt="Photo ${i + 1}">
+      <button class="photo-thumb-rm" onclick="rmEditPhoto(event,${i})" title="Remove">×</button>
+    </div>`).join('')
+    + `<div class="photo-add" title="Add more photos">
+        <span style="font-size:20px;line-height:1">+</span>
+        <span>Add</span>
+       </div>`;
+}
+
+function editZoneClick(e) {
+  if (e.target.closest('.photo-thumb-rm')) return;
+  $('ef_photoIn').click();
+}
+
+async function loadEditPhotoFromUrl(url) {
+  if (!url || !url.startsWith('http')) return;
+  const tryFetch = async (fetchUrl) => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10000);
+    try {
+      const res = await fetch(fetchUrl, { signal: ctrl.signal });
+      clearTimeout(timer);
+      if (!res.ok) return null;
+      const blob = await res.blob();
+      return blob.type.startsWith('image/') ? blob : null;
+    } catch { clearTimeout(timer); return null; }
+  };
+  let blob = await tryFetch(url);
+  if (!blob) blob = await tryFetch(`https://corsproxy.io/?url=${encodeURIComponent(url)}`);
+  if (blob) loadEditPhotoBlob(blob);
+  else toast('Could not load image', true);
+}
+
+function setupEditDropZone() {
+  const zone = $('ef_dropZone');
+  if (!zone) return;
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  zone.addEventListener('dragleave', e => { if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag'); });
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag');
+    const imageFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    if (imageFiles.length) { imageFiles.forEach(f => loadEditPhotoBlob(f)); return; }
+    const html = e.dataTransfer.getData('text/html');
+    if (html) {
+      const src = extractImgSrc(html);
+      if (src) { loadEditPhotoFromUrl(src); return; }
+    }
+    const uri = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain');
+    if (uri) {
+      const url = uri.trim().split('\n')[0].trim();
+      if (url.startsWith('http')) loadEditPhotoFromUrl(url);
+    }
+  });
+}
+
+function setupDrop() {
+  const zone = $('dropZone');
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag'); });
+  // Only remove highlight when truly leaving the zone (not just moving to a child)
+  zone.addEventListener('dragleave', e => { if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag'); });
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag');
+
+    // 1. Actual image files — local file drag or screenshot
+    const imageFiles = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    if (imageFiles.length) { imageFiles.forEach(f => loadPhotoBlob(f)); return; }
+
+    // 2. Image dragged from another browser tab — browser sends text/html with <img src>
+    const html = e.dataTransfer.getData('text/html');
+    if (html) {
+      const src = extractImgSrc(html);
+      if (src) { loadPhotoFromUrl(src); return; }
+    }
+
+    // 3. Plain URL or URI list (drag from address bar, some browsers)
+    const uri = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain');
+    if (uri) {
+      const url = uri.trim().split('\n')[0].trim();
+      if (url.startsWith('http')) loadPhotoFromUrl(url);
+    }
+  });
+  // Ctrl+V / Cmd+V anywhere while the modal is open
+  document.addEventListener('paste', handlePasteEvent);
+}
+
+// ─── URL import ───────────────────────────────────────────────────────────────
+async function fetchFromUrl() {
+  const url = $('furl').value.trim();
+  if (!url) return;
+
+  const statusEl = $('urlStatus');
+  $('urlFetchBtn').disabled = true;
+
+  // ── Step 1: try to scrape the page via CORS proxies ──────────────────────
+  statusEl.innerHTML = '<div class="loading"><div class="spin"></div>Fetching product page…</div>';
+  let scraped = null;
+
+  const proxies = [
+    u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+    u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  ];
+
+  for (const makeProxy of proxies) {
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 12000);
+      const res = await fetch(makeProxy(url), { signal: ctrl.signal });
+      clearTimeout(timer);
+      if (!res.ok) continue;
+      const html = await res.text();
+      scraped = parseProductHTML(html);
+      if (scraped?.name) break; // good enough
+    } catch { /* try next proxy */ }
+  }
+
+  // ── Step 2: ask Claude to classify (with or without scraped data) ─────────
+  if (!apiKey) {
+    if (scraped) applyScraped(scraped, null);
+    statusEl.innerHTML = scraped?.name
+      ? `<span style="color:#059669">✓ Filled from page. Add a Claude API key for smarter field mapping.</span>`
+      : `<span style="color:var(--accent-dk)">Site blocked scraping. Add a Claude API key to use its product knowledge instead.</span>`;
+    $('urlFetchBtn').disabled = false;
+    return;
+  }
+
+  statusEl.innerHTML = '<div class="loading"><div class="spin"></div>Asking Claude to classify…</div>';
+
+  try {
+    const prompt = buildUrlPrompt(url, scraped);
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 512,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const raw = data.content?.[0]?.text?.trim() || '';
+    const m = raw.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('No JSON in response');
+    const tags = JSON.parse(m[0]);
+
+    applyScraped(scraped, tags);
+
+    // Try to fetch product image into the photo slot (silently skip if blocked)
+    const imgUrl = tags.imageUrl || scraped?.image;
+    if (imgUrl && !photos.length) await tryFetchImage(imgUrl);
+
+    const src = extractHostname(url);
+    statusEl.innerHTML = `<span style="color:#059669">✓ Filled from ${esc(src)} — review and adjust as needed.</span>`;
+  } catch (e) {
+    console.error(e);
+    if (scraped) applyScraped(scraped, null);
+    statusEl.innerHTML = `<span style="color:var(--danger)">Claude error: ${esc(e.message)}${scraped ? ' — basic fields filled from page.' : ''}</span>`;
+  }
+
+  $('urlFetchBtn').disabled = false;
+}
+
+function parseProductHTML(html) {
+  try {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+
+    // ── JSON-LD Product schema ──────────────────────────────────────────────
+    for (const s of doc.querySelectorAll('script[type="application/ld+json"]')) {
+      try {
+        const raw = JSON.parse(s.textContent.trim());
+        const nodes = [raw, ...(raw['@graph'] || [])].flat();
+        for (const node of nodes) {
+          const type = node['@type'];
+          if (type === 'Product' || (Array.isArray(type) && type.includes('Product'))) {
+            const offers = Array.isArray(node.offers) ? node.offers[0] : node.offers;
+            return {
+              name:        node.name,
+              brand:       node.brand?.name || (typeof node.brand === 'string' ? node.brand : null),
+              description: node.description,
+              color:       node.color,
+              material:    node.material,
+              price:       offers?.price,
+              currency:    offers?.priceCurrency || 'USD',
+              image:       Array.isArray(node.image) ? node.image[0] : (typeof node.image === 'string' ? node.image : node.image?.url),
+            };
+          }
+        }
+      } catch { /* malformed JSON-LD, skip */ }
+    }
+
+    // ── Open Graph + product meta fallback ─────────────────────────────────
+    const og   = p => doc.querySelector(`meta[property="${p}"]`)?.content || null;
+    const meta = p => doc.querySelector(`meta[name="${p}"]`)?.content || null;
+    return {
+      name:        og('og:title') || doc.title || null,
+      description: og('og:description') || meta('description') || null,
+      image:       og('og:image') || null,
+      brand:       og('product:brand') || meta('brand') || null,
+      price:       og('product:price:amount') || meta('price') || null,
+      color:       og('product:color') || meta('color') || null,
+    };
+  } catch { return null; }
+}
+
+function buildUrlPrompt(url, scraped) {
+  // Extract URL signals to help Claude identify the product correctly
+  let urlSignals = '';
+  try {
+    const u = new URL(url);
+    const pathParts = u.pathname.split('/').filter(Boolean);
+    const productCode = pathParts.find(p => /^E\d{6}/.test(p) || /^[A-Z]\d{6}/.test(p)) || null;
+    const params = Object.fromEntries(u.searchParams.entries());
+    const signals = [];
+    if (productCode) signals.push(`Product code in URL: ${productCode}`);
+    Object.entries(params).forEach(([k, v]) => {
+      if (/color|colour|variant|style|sku/i.test(k)) signals.push(`URL param ${k}=${v}`);
+    });
+    if (signals.length) urlSignals = `\nURL signals: ${signals.join(', ')}`;
+  } catch {}
+
+  const lines = [
+    `I'm adding a clothing item to my wardrobe app.`,
+    `Product URL: ${url}${urlSignals}`,
+    ``,
+    `IMPORTANT: The URL is your primary source of truth. Use the URL's product code, path, and parameters (e.g. colorDisplayCode, color=, variant=) to identify the exact product and color variant from your training knowledge.`,
+  ];
+
+  if (scraped) {
+    lines.push(`\nPage data scraped via proxy (may be from a different page or cache — verify it matches the URL before using it):`);
+    if (scraped.name)        lines.push(`  Scraped name: ${scraped.name}`);
+    if (scraped.brand)       lines.push(`  Scraped brand: ${scraped.brand}`);
+    if (scraped.description) lines.push(`  Scraped description: ${scraped.description.slice(0, 400)}`);
+    if (scraped.color)       lines.push(`  Scraped color: ${scraped.color}`);
+    if (scraped.material)    lines.push(`  Scraped material: ${scraped.material}`);
+    if (scraped.price)       lines.push(`  Scraped price: ${scraped.price} ${scraped.currency || ''}`);
+    if (scraped.image)       lines.push(`  Scraped image URL: ${scraped.image}`);
+    lines.push(`If the scraped data does not match the URL's product, ignore it and rely on your training knowledge instead.`);
+  } else {
+    lines.push(`(Page could not be fetched — use your training knowledge of this brand/product.)`);
+  }
+
+  lines.push(`
+Return ONLY a JSON object. All fields are estimates the user will review:
+{
+  "name": "short descriptive name including the specific color, e.g. 'Dark Green Linen Blend Dress'",
+  "brand": "brand name",
+  "category": one of "Tops"|"Bottoms"|"Dresses"|"Sets"|"Outerwear"|"Shoes"|"Bags"|"Accessories"|"Other" (use "Sets" for matching coord sets, PJ sets, sweatsuits, swimsuit+coverup combos),
+  "color": "specific color in plain English, e.g. 'dark green', 'black', 'off-white'",
+  "material": "estimated material/texture from the photo or description, e.g. 'ribbed knit', 'silk', 'structured wool', 'washed denim'",
+  "classification": one of "Work — Business Casual"|"Work — Business Formal / Events"|"Casual"|"Smart Casual"|"Special Occasion"|"Athleisure"|"Vacation / Travel"|"PJs / Loungewear"|"Gym / Workout"|"Bags / Accessories",
+  "season": one of "All-Season"|"Spring-Summer"|"Fall-Winter",
+  "size": "estimated size if visible/inferable for Tops/Bottoms/Sets/Dresses/Outerwear/Shoes (e.g. 'M', '8', '32x30'); else null",
+  "price": number or null,
+  "imageUrl": "best product image URL if you have it, else null"
+}
+Return only the JSON object, no markdown, no explanation.`);
+  return lines.join('\n');
+}
+
+function applyScraped(scraped, tags) {
+  const t = tags || {};
+  const r = scraped || {};
+  const name  = t.name  || r.name;
+  const brand = t.brand || r.brand;
+  const price = t.price ?? r.price;
+  const material = t.material || r.material;
+
+  if (name  && !$('fn').value.trim())   $('fn').value   = titleCase(name);
+  if (brand && !$('fb').value.trim())   $('fb').value   = brand; // brands often have their own casing (ASOS, COS, &OtherStories)
+  if (price != null && price !== '' && !$('fcost').value) $('fcost').value = parseFloat(price) || '';
+  if (t.category && CATS.includes(t.category) && !$('fcat').value) { $('fcat').value = t.category; onCatChange(); }
+  if (t.color    && !$('fcol').value.trim())                   $('fcol').value = titleCase(t.color);
+  if (material   && !$('fmat').value.trim())                   $('fmat').value = titleCase(material);
+  if (t.classification && CLASSES.includes(t.classification) && !$('fcls').value) $('fcls').value = t.classification;
+  if (t.season   && SEAS.includes(t.season) && !$('fsea').value) $('fsea').value = t.season;
+  if (t.size && SIZE_CATS.includes($('fcat').value) && !$('fsize').value.trim()) $('fsize').value = titleCase(t.size);
+}
+
+async function tryFetchImage(imgUrl) {
+  if (!imgUrl) return;
+  try {
+    const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(imgUrl)}`;
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 10000);
+    const res = await fetch(proxyUrl, { signal: ctrl.signal });
+    clearTimeout(timer);
+    if (!res.ok) return;
+    const blob = await res.blob();
+    if (!blob.type.startsWith('image/')) return;
+    await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        photos.push({ b64: ev.target.result.split(',')[1], mime: blob.type });
+        renderPhotoGrid();
+        resolve();
+      };
+      reader.readAsDataURL(blob);
+    });
+  } catch { /* silently skip — image fetch is best-effort */ }
+}
+
+function extractHostname(url) {
+  try { return new URL(url).hostname.replace('www.', ''); } catch { return url; }
+}
+
+// ─── AI tagging ───────────────────────────────────────────────────────────────
+async function runAI() {
+  const msg = $('aiMsg');
+  if (!apiKey) {
+    msg.innerHTML = '<span style="color:var(--accent-dk)">No API key — open Settings to add your Claude key.</span>';
+    return;
+  }
+  if (!photos.length) return;
+
+  msg.innerHTML = '<div class="loading"><div class="spin"></div>Analyzing with Claude…</div>';
+
+  const prompt = `Analyze this clothing item photo and return ONLY a JSON object. Every field is an estimate the user will review and confirm before saving:
+{
+  "name": short descriptive name including color, e.g. "Navy Linen Blazer" or "Floral Midi Dress",
+  "category": one of "Tops"|"Bottoms"|"Dresses"|"Sets"|"Outerwear"|"Shoes"|"Bags"|"Accessories"|"Other" (use "Sets" for matching coord sets, PJ sets, sweatsuits, swimsuit+coverup combos),
+  "color": primary color in plain English (e.g. "navy", "cream", "olive green", "burgundy"),
+  "material": estimated material / texture from the photo, e.g. "ribbed knit", "silk", "structured wool", "washed denim",
+  "classification": one of "Work — Business Casual"|"Work — Business Formal / Events"|"Casual"|"Smart Casual"|"Special Occasion"|"Athleisure"|"Vacation / Travel"|"PJs / Loungewear"|"Gym / Workout"|"Bags / Accessories",
+  "season": one of "All-Season"|"Spring-Summer"|"Fall-Winter",
+  "size": estimated size only if category is Tops/Bottoms/Sets/Dresses/Outerwear/Shoes AND visibly inferable (e.g. "M", "8", "32x30"); otherwise null
+}
+Return only the JSON object, no markdown, no explanation.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 256,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: photos[0].mime, data: photos[0].b64 } },
+            { type: 'text', text: prompt },
+          ],
+        }],
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const raw = data.content?.[0]?.text?.trim() || '';
+    const m = raw.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('No JSON in response');
+    const tags = JSON.parse(m[0]);
+
+    if (tags.category && CATS.includes(tags.category) && !$('fcat').value)          { $('fcat').value = tags.category; onCatChange(); }
+    if (tags.color    && !$('fcol').value.trim())                                   $('fcol').value = titleCase(tags.color);
+    if (tags.material && !$('fmat').value.trim())                                   $('fmat').value = titleCase(tags.material);
+    if (tags.classification && CLASSES.includes(tags.classification) && !$('fcls').value) $('fcls').value = tags.classification;
+    if (tags.season   && SEAS.includes(tags.season)   && !$('fsea').value)          $('fsea').value = tags.season;
+    if (tags.name     && !$('fn').value.trim())                                     $('fn').value   = titleCase(tags.name);
+    if (tags.size && SIZE_CATS.includes($('fcat').value) && $('fsize') && !$('fsize').value.trim()) $('fsize').value = titleCase(tags.size);
+
+    msg.innerHTML = '<span style="color:#059669">✓ Fields auto-filled — review and adjust as needed.</span>';
+  } catch (e) {
+    console.error(e);
+    msg.innerHTML = `<span style="color:var(--danger)">AI tagging failed: ${esc(e.message)}</span>`;
+  }
+}
+
+// ─── Save new item ────────────────────────────────────────────────────────────
+function saveNew() {
+  const name = $('fn').value.trim();
+  const cat  = $('fcat').value;
+  if (!name) { toast('Item name is required', true); return; }
+  if (!cat)  { toast('Category is required', true); return; }
+
+  const item = {
+    id: crypto.randomUUID(),
+    name,
+    brand:        $('fb').value.trim(),
+    retailer:     $('fret').value.trim(),
+    dateAcquired: $('fdate').value.trim(),
+    category:     cat,
+    color:        $('fcol').value.trim(),
+    material:     $('fmat').value.trim(),
+    classification: $('fcls').value,
+    season:       $('fsea').value,
+    size:         SIZE_CATS.includes(cat) ? $('fsize').value.trim() : '',
+    condition:    $('fcon').value,
+    cost:         parseFloat($('fcost').value) || null,
+    notes:        $('fnotes').value.trim(),
+    why:          addMode === 'wishlist' ? $('fwhy').value.trim() : '',
+    photos:       photos.map(p => `data:${p.mime};base64,${p.b64}`),
+    photo:        photos.length ? `data:${photos[0].mime};base64,${photos[0].b64}` : null,
+    sourceUrl:    $('furl').value.trim() || null,
+    linkedIds:    [],
+    createdAt:    Date.now(),
+  };
+
+  if (addMode === 'wishlist') wishlist.unshift(item);
+  else items.unshift(item);
+  persist();
+  render();
+  closeAdd();
+  toast(addMode === 'wishlist' ? 'Added to Pipeline' : 'Item underwritten');
+}
+
+// ─── Detail modal ─────────────────────────────────────────────────────────────
+function findItemAnywhere(id) {
+  return items.find(i => i.id === id) || wishlist.find(i => i.id === id);
+}
+function findItemSource(id) {
+  if (items.some(i => i.id === id)) return 'inventory';
+  if (wishlist.some(i => i.id === id)) return 'wishlist';
+  return null;
+}
+
+function openDet(id) {
+  viewId = id; editMode = false;
+  viewIsWish = findItemSource(id) === 'wishlist';
+  drawDet();
+  open$('detOv');
+}
+function closeDet() { close$('detOv'); viewId = null; editMode = false; }
+
+function toggleEdit() {
+  editMode = !editMode;
+  drawDet();
+}
+
+function drawDet() {
+  const it = findItemAnywhere(viewId);
+  if (!it) return;
+  const isWish = viewIsWish;
+
+  $('detTitle').textContent = editMode ? 'Edit Item' : it.name || 'Details';
+
+  const editSvg = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`;
+  const closeSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`;
+  $('editBtn').innerHTML = editMode ? closeSvg : editSvg;
+  $('editBtn').title = editMode ? 'Cancel' : 'Edit';
+
+  if (editMode) {
+    // Initialize editPhotos from the item BEFORE rendering the form
+    editPhotos = it.photos?.length ? [...it.photos] : (it.photo ? [it.photo] : []);
+    $('detBody').innerHTML = editForm(it);
+    renderEditPhotoGrid();
+    setupEditDropZone();
+    // wire up size visibility for edit form
+    const efCat = $('ef_cat');
+    if (efCat) {
+      const updateSize = () => {
+        const wrap = $('ef_sizeWrap');
+        if (wrap) wrap.style.display = SIZE_CATS.includes(efCat.value) ? 'block' : 'none';
+      };
+      efCat.addEventListener('change', updateSize);
+      updateSize();
+    }
+    $('detFt').innerHTML = `
+      <button class="btn btn-danger" onclick="delItem('${it.id}')">Delete</button>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost" onclick="toggleEdit()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEdit('${it.id}')">Save Changes</button>`;
+  } else {
+    $('detBody').innerHTML = detView(it);
+    const wishBtn = isWish
+      ? `<button class="btn btn-primary" onclick="underwrite('${it.id}')" style="margin-right:8px" title="Move to Portfolio">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="margin-right:4px"><polyline points="20 6 9 17 4 12"/></svg>
+          Mark as Underwritten
+         </button>`
+      : '';
+    $('detFt').innerHTML = `
+      <button class="btn btn-danger" onclick="delItem('${it.id}')">Delete Item</button>
+      <div class="spacer"></div>
+      ${wishBtn}<button class="btn btn-ghost" onclick="closeDet()">Close</button>`;
+  }
+}
+
+function detView(it) {
+  const showSize = SIZE_CATS.includes(it.category);
+  const rows = [
+    ['Category', it.category], ['Brand', it.brand], ['Retailer', it.retailer],
+    ['Color', it.color], ['Material / Texture', it.material],
+    ['Classification', it.classification], ['Season', it.season],
+    showSize ? ['Size', it.size] : null,
+    ['Current Condition', it.condition],
+    ['Acquisition Date', it.dateAcquired],
+    ['Cost Basis', it.cost != null ? `$${it.cost}` : null],
+  ].filter(r => r && r[1]);
+
+  const allPhotos = it.photos?.length ? it.photos : (it.photo ? [it.photo] : []);
+  const photoHtml = allPhotos.length === 0 ? '' : allPhotos.length === 1
+    ? `<div class="det-photos"><img class="det-main-photo" src="${esc(allPhotos[0])}" alt="${esc(it.name)}"></div>`
+    : `<div class="det-photos">
+        <img class="det-main-photo" id="detMainPhoto" src="${esc(allPhotos[0])}" alt="${esc(it.name)}">
+        <div class="det-strip">
+          ${allPhotos.map((p, i) => `<img class="det-strip-thumb${i === 0 ? ' active' : ''}" src="${esc(p)}" alt="Photo ${i+1}"
+            onclick="setDetPhoto(this,'${esc(p)}')">`).join('')}
+        </div>
+      </div>`;
+
+  // Portfolio Pairs (inventory items only — not on wishlist)
+  const cww = !viewIsWish ? cwwSection(it) : '';
+
+  // Underwriting badge + thesis (only for portfolio items that came from Pipeline)
+  const underwrittenBlock = (!viewIsWish && it.underwritten) ? `
+    <div style="margin-top:14px;padding:12px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span class="attr-lbl" style="color:#059669">Underwritten${it.underwrittenAt ? ' · ' + new Date(it.underwrittenAt).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}) : ''}</span>
+      </div>
+      ${it.underwritingThesis ? `<div style="font-size:13px;line-height:1.5;color:#064e3b">
+        <strong>Thesis:</strong> ${esc(it.underwritingThesis)}
+      </div>` : ''}
+    </div>` : '';
+
+  return `
+    ${photoHtml}
+    <div class="attrs">
+      ${rows.map(([l,v]) => `<div class="attr"><div class="attr-lbl">${esc(l)}</div><div class="attr-val">${esc(v)}</div></div>`).join('')}
+    </div>
+    ${underwrittenBlock}
+    ${it.why ? `<div style="margin-top:14px;padding:12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px">
+      <div class="attr-lbl">Why I Want It</div>
+      <div style="font-size:14px;margin-top:4px;line-height:1.5">${esc(it.why)}</div>
+    </div>` : ''}
+    ${it.notes ? `<div style="margin-top:14px;padding:12px;background:var(--bg);border-radius:8px">
+      <div class="attr-lbl">Investment Notes</div>
+      <div style="font-size:14px;margin-top:4px;line-height:1.5">${esc(it.notes)}</div>
+    </div>` : ''}
+    ${it.sourceUrl ? `<div style="margin-top:14px">
+      <div class="attr-lbl" style="margin-bottom:5px">Source</div>
+      <a class="source-link" href="${esc(it.sourceUrl)}" target="_blank" rel="noopener">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        ${esc(extractHostname(it.sourceUrl))}
+      </a>
+    </div>` : ''}
+    ${cww}
+    <div style="margin-top:12px;font-size:11px;color:var(--text-muted)">Added ${new Date(it.createdAt).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})}</div>`;
+}
+
+// ─── Portfolio Pairs ──────────────────────────────────────────────────────────
+function cwwSection(it) {
+  const linked = (it.linkedIds || []).map(id => items.find(i => i.id === id)).filter(Boolean);
+  const thumbs = linked.map(li => {
+    const src = (li.photos?.[0] || li.photo);
+    const inner = src ? `<img src="${esc(src)}" alt="${esc(li.name)}">` : `<div class="cww-thumb-no">${photoIcon(20)}</div>`;
+    return `<div class="cww-thumb" onclick="openDetFromCww('${li.id}')" title="${esc(li.name)}">
+      ${inner}
+      <button class="cww-rm" onclick="cwwRemove(event,'${it.id}','${li.id}')" title="Unlink">×</button>
+    </div>`;
+  }).join('');
+  const canAdd = linked.length < 10;
+  return `<div class="cww-section">
+    <div class="cww-hd">
+      <div class="attr-lbl">Portfolio Pairs</div>
+      <div style="font-size:11px;color:var(--text-muted)">${linked.length}/10</div>
+    </div>
+    <div class="cww-strip">
+      ${thumbs || '<div style="font-size:13px;color:var(--text-muted)">No linked items yet.</div>'}
+    </div>
+    ${canAdd ? `<div class="cww-search">
+      <input type="text" id="cwwQ" placeholder="Search portfolio to link…" oninput="cwwSearch('${it.id}')" onfocus="cwwSearch('${it.id}')">
+      <div class="cww-results" id="cwwResults"></div>
+    </div>` : ''}
+  </div>`;
+}
+
+function cwwSearch(itemId) {
+  const q = ($('cwwQ')?.value || '').toLowerCase().trim();
+  const it = findItemAnywhere(itemId);
+  if (!it) return;
+  const linked = new Set(it.linkedIds || []);
+  const candidates = items.filter(i =>
+    i.id !== itemId &&
+    !linked.has(i.id) &&
+    (!q || (i.name||'').toLowerCase().includes(q) || (i.category||'').toLowerCase().includes(q))
+  ).slice(0, 25);
+  const box = $('cwwResults');
+  if (!box) return;
+  if (!candidates.length) { box.classList.remove('open'); box.innerHTML = ''; return; }
+  box.innerHTML = candidates.map(c => {
+    const src = (c.photos?.[0] || c.photo);
+    const img = src ? `<img src="${esc(src)}" alt="">` : `<div class="cww-result-no">${photoIcon(16)}</div>`;
+    return `<div class="cww-result" onclick="cwwAdd('${itemId}','${c.id}')">
+      ${img}
+      <div class="cww-result-info">
+        <div class="cww-result-name">${esc(c.name||'Untitled')}</div>
+        <div class="cww-result-meta">${esc(c.category||'')}${c.color ? ' · '+esc(c.color) : ''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  box.classList.add('open');
+}
+
+function cwwAdd(itemId, linkId) {
+  const idx = items.findIndex(i => i.id === itemId);
+  if (idx < 0) return;
+  const cur = items[idx].linkedIds || [];
+  if (cur.length >= 10) { toast('Max 10 linked items', true); return; }
+  if (cur.includes(linkId)) return;
+  items[idx] = { ...items[idx], linkedIds: [...cur, linkId] };
+  persist();
+  drawDet();
+}
+
+function cwwRemove(e, itemId, linkId) {
+  e.stopPropagation();
+  const idx = items.findIndex(i => i.id === itemId);
+  if (idx < 0) return;
+  items[idx] = { ...items[idx], linkedIds: (items[idx].linkedIds||[]).filter(id => id !== linkId) };
+  persist();
+  drawDet();
+}
+
+function openDetFromCww(id) {
+  viewId = id; viewIsWish = false; editMode = false;
+  drawDet();
+}
+
+// Underwrite a Pipeline item — move it into the Portfolio.
+// Records when it was underwritten and preserves "Why I Want It" as the underwriting thesis.
+function underwrite(id) {
+  const idx = wishlist.findIndex(i => i.id === id);
+  if (idx < 0) return;
+  const src = wishlist[idx];
+  if (!confirm(`Mark "${src.name || 'this item'}" as Underwritten?\n\nThis moves it from Pipeline into your Portfolio.`)) return;
+  const it = {
+    ...src,
+    underwritten: true,
+    underwrittenAt: Date.now(),
+    underwritingThesis: src.why || '',  // preserve the rationale
+    why: '',                             // why-i-want-it no longer applies
+    linkedIds: src.linkedIds || [],
+  };
+  wishlist.splice(idx, 1);
+  items.unshift(it);
+  persist();
+  switchView('inventory');
+  closeDet();
+  toast('Underwritten — moved to Portfolio');
+}
+
+function setDetPhoto(thumb, src) {
+  const main = document.getElementById('detMainPhoto');
+  if (main) main.src = src;
+  document.querySelectorAll('.det-strip-thumb').forEach(t => t.classList.remove('active'));
+  thumb.classList.add('active');
+}
+
+function editForm(it) {
+  const sel = (arr, v) => arr.map(o => `<option${o===v?' selected':''}>${esc(o)}</option>`).join('');
+  const showSize = SIZE_CATS.includes(it.category);
+  // Editable photo zone — editPhotos is initialized in drawDet() before this is rendered
+  const photoHtml = `
+    <div class="fg">
+      <label>Photos</label>
+      <div class="upload-zone" id="ef_dropZone" onclick="editZoneClick(event)">
+        <input type="file" id="ef_photoIn" accept="image/*" multiple onchange="onEditPhoto(event)">
+        <div id="ef_photoGrid" class="photo-grid" style="display:none"></div>
+        <div id="ef_upPrompt" class="upload-prompt">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin:0 auto;color:var(--border)">
+            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <div class="upload-txt"><strong>Click to upload</strong>, drag &amp; drop, or paste<br><small style="opacity:.7">JPG · PNG · WEBP · multiple photos · Ctrl+V to paste</small></div>
+        </div>
+      </div>
+    </div>`;
+  return `
+    ${photoHtml}
+    <div class="frow">
+      <div class="fg"><label>Item Name *</label><input type="text" id="ef_n" value="${esc(it.name||'')}"></div>
+      <div class="fg"><label>Brand</label><input type="text" id="ef_b" value="${esc(it.brand||'')}"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Retailer</label><input type="text" id="ef_ret" value="${esc(it.retailer||'')}" placeholder="e.g. Nordstrom"></div>
+      <div class="fg"><label>Acquisition Date</label><input type="text" id="ef_date" value="${esc(it.dateAcquired||'')}" placeholder="e.g. March 2024"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Category *</label>
+        <select id="ef_cat"><option value="">Select…</option>${sel(CATS,it.category)}</select></div>
+      <div class="fg"><label>Color</label><input type="text" id="ef_col" value="${esc(it.color||'')}"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Material / Texture</label>
+        <input type="text" id="ef_mat" value="${esc(it.material||'')}" placeholder="e.g. ribbed knit, silk"></div>
+      <div class="fg"><label>Classification</label>
+        <select id="ef_cls"><option value="">Select…</option>${sel(CLASSES,it.classification)}</select></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Season</label>
+        <select id="ef_sea"><option value="">Select…</option>${sel(SEAS,it.season)}</select></div>
+      <div class="fg" id="ef_sizeWrap" style="display:${showSize?'block':'none'}"><label>Size</label>
+        <input type="text" id="ef_size" value="${esc(it.size||'')}" placeholder="e.g. M, 8, 32x30"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label>Current Condition</label>
+        <select id="ef_con"><option value="">Select…</option>${sel(CONDS,it.condition)}</select></div>
+      <div class="fg"><label>Cost Basis ($)</label>
+        <input type="number" id="ef_cost" value="${it.cost??''}" min="0" step="1"></div>
+    </div>
+    ${viewIsWish ? `<div class="fg"><label>Why I Want It</label>
+      <textarea id="ef_why">${esc(it.why||'')}</textarea></div>` : ''}
+    <div class="fg"><label>Investment Notes</label>
+      <textarea id="ef_notes">${esc(it.notes||'')}</textarea></div>
+    <div class="fg"><label>Source URL</label>
+      <input type="text" id="ef_url" value="${esc(it.sourceUrl||'')}" placeholder="https://…"></div>`;
+}
+
+function saveEdit(id) {
+  const name = $$('ef_n').value.trim();
+  const cat  = $$('ef_cat').value;
+  if (!name) { toast('Name required', true); return; }
+  if (!cat)  { toast('Category required', true); return; }
+
+  const arr = viewIsWish ? wishlist : items;
+  const idx = arr.findIndex(i => i.id === id);
+  if (idx < 0) return;
+  arr[idx] = {
+    ...arr[idx], name, brand: $$('ef_b').value.trim(),
+    retailer:     $$('ef_ret').value.trim(),
+    dateAcquired: $$('ef_date').value.trim(),
+    category: cat, color: $$('ef_col').value.trim(),
+    material: $$('ef_mat').value.trim(),
+    classification: $$('ef_cls').value,
+    season: $$('ef_sea').value,
+    size: SIZE_CATS.includes(cat) ? ($$('ef_size')?.value.trim() || '') : '',
+    condition: $$('ef_con').value,
+    cost: parseFloat($$('ef_cost').value) || null,
+    notes: $$('ef_notes').value.trim(),
+    why: viewIsWish ? ($$('ef_why')?.value.trim() || '') : (arr[idx].why || ''),
+    sourceUrl: $$('ef_url').value.trim() || null,
+    photos: editPhotos.slice(),
+    photo:  editPhotos[0] || null,
+  };
+  persist(); render(); editMode = false; drawDet();
+  toast('Changes saved');
+}
+
+function delItem(id) {
+  if (!confirm('Delete this item?')) return;
+  if (viewIsWish) wishlist = wishlist.filter(i => i.id !== id);
+  else items = items.filter(i => i.id !== id);
+  persist(); render(); closeDet();
+  toast('Item deleted');
+}
+
+// ─── Settings ─────────────────────────────────────────────────────────────────
+function openSettings() {
+  $('apiIn').value = apiKey;
+  updateStoreInfo();
+  open$('setOv');
+}
+function closeSettings() { close$('setOv'); }
+function saveSettings() {
+  apiKey = $('apiIn').value.trim();
+  localStorage.setItem('wrd_key', apiKey);
+  closeSettings();
+  toast('Settings saved');
+}
+// ─── Export / Import ──────────────────────────────────────────────────────────
+function exportData() {
+  const payload = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    items,
+    wishlist,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `wardrobe-underwriter-backup-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Backup downloaded');
+}
+
+function importData(e) {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      const incomingItems = Array.isArray(data.items) ? data.items : (Array.isArray(data) ? data : []);
+      const incomingWish  = Array.isArray(data.wishlist) ? data.wishlist : [];
+      if (!incomingItems.length && !incomingWish.length) {
+        toast('No items found in file', true);
+        return;
+      }
+      const choice = confirm(
+        `Found ${incomingItems.length} Portfolio items and ${incomingWish.length} Pipeline items.\n\n` +
+        `OK = Merge with existing data\nCancel = Replace existing data`
+      );
+      if (choice) {
+        // Merge — skip items whose id already exists
+        const existIds = new Set([...items, ...wishlist].map(i => i.id));
+        items    = [...items,    ...incomingItems.filter(i => !existIds.has(i.id)).map(migrateItem)];
+        wishlist = [...wishlist, ...incomingWish.filter(i => !existIds.has(i.id)).map(migrateItem)];
+      } else {
+        items    = incomingItems.map(migrateItem);
+        wishlist = incomingWish.map(migrateItem);
+      }
+      persist(); render();
+      toast(`Imported ${incomingItems.length + incomingWish.length} items`);
+    } catch (err) {
+      console.error(err);
+      toast('Invalid JSON file', true);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function updateStoreInfo() {
+  try {
+    let bytes = 0;
+    for (const k of Object.keys(localStorage)) {
+      if (k.startsWith('wrd_')) bytes += (localStorage.getItem(k) || '').length * 2;
+    }
+    const mb  = (bytes / 1048576).toFixed(2);
+    const pct = Math.min(100, Math.round(bytes / (5 * 1048576) * 100));
+    $('storeInfo').innerHTML = `<strong>${mb} MB</strong> used of ~5 MB limit &nbsp;(${pct}%) &nbsp;·&nbsp; ${items.length} portfolio, ${wishlist.length} pipeline`;
+  } catch { $('storeInfo').textContent = 'Unable to calculate'; }
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function $(id)     { return document.getElementById(id); }
+function $$(id)    { return document.getElementById(id); }
+function open$(id) { $(id).classList.add('open'); }
+function close$(id){ $(id).classList.remove('open'); }
+function esc(s)    { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// Title-case for AI-filled free-text fields. Capitalizes the first letter of each word.
+// Treats hyphens as word boundaries ("off-white" → "Off-White") but leaves digit/letter
+// runs alone ("32x30" stays "32x30") so size strings aren't mangled.
+function titleCase(s) {
+  return String(s || '').toLowerCase().replace(/(^|[\s\-/])([a-z])/g, (_, sep, ch) => sep + ch.toUpperCase());
+}
+function photoIcon(s) {
+  return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+}
+function ovClick(e, id) {
+  // Only react to clicks on the backdrop itself (not its children)
+  if (e.target.id !== id) return;
+  // Never dismiss data-entry modals via backdrop click — too easy to lose unsaved input
+  // (e.g. if the user tabs away and clicks back into the window, the first click can land here)
+  if (id === 'addOv') return;
+  if (id === 'detOv' && editMode) return;
+  close$(id);
+}
+
+let toastTmr;
+function toast(msg, err=false) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (err ? ' err' : '');
+  clearTimeout(toastTmr);
+  toastTmr = setTimeout(() => el.className = 'toast', 3200);
+}
+
+// ─── PWA: Service Worker registration ─────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW reg failed:', err));
+  });
+}
+
+// ─── PWA: Install banner ──────────────────────────────────────────────────────
+let deferredInstallPrompt = null;
+function isIos()        { return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream; }
+function isStandalone() { return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true; }
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  maybeShowInstallBanner();
+});
+
+function maybeShowInstallBanner() {
+  if (isStandalone()) return;
+  if (localStorage.getItem('wrd_install_dismissed')) return;
+  const banner = $('installBanner');
+  if (!banner) return;
+  if (isIos()) {
+    // iOS Safari doesn't fire beforeinstallprompt — show manual instructions
+    $('installText').innerHTML = '<strong>Add to Home Screen</strong> — tap the Share icon ⬆ in Safari, then "Add to Home Screen".';
+    $('installAction').style.display = 'none';
+  }
+  banner.classList.add('show');
+}
+
+function dismissInstall() {
+  localStorage.setItem('wrd_install_dismissed', '1');
+  $('installBanner').classList.remove('show');
+}
+
+function doInstall() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(() => {
+    deferredInstallPrompt = null;
+    $('installBanner').classList.remove('show');
+  });
+}
+
+window.addEventListener('load', () => {
+  // For iOS users we don't get an install event, so show the hint after load.
+  if (isIos() && !isStandalone()) setTimeout(maybeShowInstallBanner, 1500);
+});
+
+window.addEventListener('appinstalled', () => {
+  $('installBanner').classList.remove('show');
+  localStorage.setItem('wrd_install_dismissed', '1');
+});
+
+// ─── Weather (Open-Meteo, New York, NY) ───────────────────────────────────────
+let weatherData = null;
+const NYC = { lat: 40.7128, lon: -74.0060 };
+
+async function fetchWeather() {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${NYC.lat}&longitude=${NYC.lon}` +
+                `&current=temperature_2m,weather_code,precipitation,relative_humidity_2m,wind_speed_10m` +
+                `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code` +
+                `&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=America/New_York&forecast_days=1`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    weatherData = {
+      temp:      Math.round(data.current.temperature_2m),
+      tempMin:   Math.round(data.daily?.temperature_2m_min?.[0] ?? data.current.temperature_2m),
+      tempMax:   Math.round(data.daily?.temperature_2m_max?.[0] ?? data.current.temperature_2m),
+      code:      data.current.weather_code,
+      precip:    data.current.precipitation ?? 0,
+      precipDay: data.daily?.precipitation_sum?.[0] ?? 0,
+      humidity:  data.current.relative_humidity_2m,
+      wind:      data.current.wind_speed_10m,
+      condition: weatherCondition(data.current.weather_code),
+      icon:      weatherIcon(data.current.weather_code),
+      fetchedAt: Date.now(),
+    };
+    renderWeather();
+  } catch (e) {
+    console.warn('Weather fetch failed:', e);
+  }
+}
+
+function weatherCondition(code) {
+  if (code === 0)   return 'Clear';
+  if (code <= 3)    return 'Cloudy';
+  if (code <= 48)   return 'Fog';
+  if (code <= 57)   return 'Drizzle';
+  if (code <= 67)   return 'Rain';
+  if (code <= 77)   return 'Snow';
+  if (code <= 82)   return 'Showers';
+  if (code <= 86)   return 'Snow Showers';
+  if (code <= 99)   return 'Thunderstorm';
+  return 'Mixed';
+}
+
+function weatherIcon(code) {
+  if (code === 0)   return '☀️';
+  if (code <= 3)    return '⛅';
+  if (code <= 48)   return '🌫️';
+  if (code <= 57)   return '🌦️';
+  if (code <= 67)   return '🌧️';
+  if (code <= 77)   return '❄️';
+  if (code <= 82)   return '🌧️';
+  if (code <= 86)   return '🌨️';
+  if (code <= 99)   return '⛈️';
+  return '🌤️';
+}
+
+function renderWeather() {
+  const el = $('weatherChip');
+  if (!el || !weatherData) return;
+  el.innerHTML = `
+    <span class="wx-icon" title="${esc(weatherData.condition)}">${weatherData.icon}</span>
+    <span class="wx-temp">${weatherData.temp}°F</span>
+    <span class="wx-cond">${esc(weatherData.condition)}</span>`;
+  el.classList.add('ready');
+}
+
+window.addEventListener('load', () => {
+  fetchWeather();
+  // Refresh every 30 minutes
+  setInterval(fetchWeather, 30 * 60 * 1000);
+});
+
+// ─── Today's Allocation (weather-aware outfit suggestion) ────────────────────
+function openAllocation() {
+  generateAllocation();
+  open$('allocOv');
+}
+
+function rerollAllocation() {
+  generateAllocation();
+}
+
+function generateAllocation() {
+  const body = $('allocBody');
+  if (!body) return;
+
+  const w = weatherData;
+  const temp = w?.temp ?? 65;
+  const precip = (w?.precipDay ?? w?.precip ?? 0) > 0.1;
+  // Define weather buckets
+  const needsOuterwear = temp < 55 || precip;
+  const isCold = temp < 50;
+  const isWarm = temp > 75;
+  const seasonPref = isCold ? 'Fall-Winter' : (isWarm ? 'Spring-Summer' : null);
+
+  // Weather summary banner
+  const wxBanner = w ? `
+    <div class="alloc-weather">
+      <span class="alloc-weather-icon">${w.icon}</span>
+      <div class="alloc-weather-text">
+        <strong>${w.temp}°F · ${esc(w.condition)}</strong> in New York
+        ${w.tempMax !== w.tempMin ? ` &middot; ${w.tempMin}°/${w.tempMax}°` : ''}
+        ${precip ? ' &middot; precipitation expected' : ''}
+        <div style="font-size:11.5px;color:var(--text-muted);margin-top:3px">
+          Filtering by ${seasonPref ? esc(seasonPref) + ' or All-Season' : 'all seasons'}${needsOuterwear ? ', adding outerwear' : ''}.
+        </div>
+      </div>
+    </div>` : `
+    <div class="alloc-weather">
+      <span class="alloc-weather-icon">🌤️</span>
+      <div class="alloc-weather-text"><strong>Weather unavailable</strong> — picking without weather context.</div>
+    </div>`;
+
+  // Filter pool: respect season preference (All-Season always allowed)
+  const dailyClassifications = ['Casual','Smart Casual','Work — Business Casual','Athleisure','Vacation / Travel'];
+  const pool = items.filter(it => {
+    if (seasonPref && it.season && it.season !== 'All-Season' && it.season !== seasonPref) return false;
+    return true;
+  });
+  const dailyPool = pool.filter(it => !it.classification || dailyClassifications.includes(it.classification));
+
+  const pickFrom = (arr, filter) => {
+    const candidates = arr.filter(filter);
+    return candidates.length ? candidates[Math.floor(Math.random() * candidates.length)] : null;
+  };
+
+  // 30% chance: pick a Sets or Dresses single-item outfit
+  const setOrDress = pickFrom(dailyPool, it => it.category === 'Sets' || it.category === 'Dresses');
+  let outfit = [];
+
+  if (setOrDress && Math.random() < 0.35) {
+    outfit.push(setOrDress);
+  } else {
+    const top    = pickFrom(dailyPool, it => it.category === 'Tops');
+    const bottom = pickFrom(dailyPool, it => it.category === 'Bottoms');
+    if (top)    outfit.push(top);
+    if (bottom) outfit.push(bottom);
+  }
+
+  if (needsOuterwear) {
+    const outer = pickFrom(pool, it => it.category === 'Outerwear');
+    if (outer) outfit.push(outer);
+  }
+
+  const shoes = pickFrom(pool, it => it.category === 'Shoes');
+  if (shoes) outfit.push(shoes);
+
+  const bag = pickFrom(pool, it => it.category === 'Bags');
+  if (bag) outfit.push(bag);
+
+  // Render
+  if (outfit.length === 0) {
+    body.innerHTML = wxBanner + `<div class="alloc-empty">
+      No portfolio items match today's weather profile. Underwrite a few pieces to start getting allocation ideas.
+    </div>`;
+    return;
+  }
+
+  body.innerHTML = wxBanner + `<div class="alloc-grid">
+    ${outfit.map(it => {
+      const src = (Array.isArray(it.photos) && it.photos[0]) || it.photo;
+      return `<div class="alloc-card" onclick="close$('allocOv'); openDet('${it.id}')">
+        ${src ? `<img src="${esc(src)}" alt="${esc(it.name||'')}">` : `<div class="card-no-photo" style="aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--border)">${photoIcon(32)}</div>`}
+        <div class="alloc-card-info">
+          <div class="alloc-card-cat">${esc(it.category||'')}</div>
+          <div class="alloc-card-name">${esc(it.name||'Untitled')}</div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+</script>
+</body>
+</html>
